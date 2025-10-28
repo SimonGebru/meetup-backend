@@ -4,7 +4,7 @@ const app = express();
 app.use(express.json());
 
 app.get("/", (req, res) => {
-    res.send("Meetup backend " + new Date().toISOString());
+    res.send("Meetup backend!! " + new Date().toISOString());
   });
 
 const PORT = process.env.PORT || 8080;
