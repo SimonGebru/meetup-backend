@@ -2,29 +2,44 @@ name: Deploy Backend
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - dev
+      - feature/*
 
 jobs:
-  build-and-deploy:
+  build:
+    name: Build check (all branches)
     runs-on: ubuntu-latest
 
     steps:
-      
       - name: Checkout code
         uses: actions/checkout@v4
 
-      
+      - name: Login to Docker Hub (optional for build check)
+        run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Build Docker image (test only)
+        run: docker build --platform linux/amd64 -t meetup-backend-test .
+
+  deploy:
+    name: Push image + Deploy to Render (only main)
+    if: github.ref == 'refs/heads/main'  # körs bara på main
+    needs: build                         # väntar på build-jobbet
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Login to Docker Hub
         run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-      
       - name: Build Docker image
         run: docker build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/meetup-backend:latest .
 
-      
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/meetup-backend:latest
 
-      
       - name: Trigger Render Deploy
         run: curl -X POST ${{ secrets.RENDER_HOOK_URL }}
