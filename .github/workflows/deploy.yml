@@ -9,23 +9,7 @@ on:
 
 jobs:
   build:
-    name: Build check (all branches)
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Login to Docker Hub (optional for build check)
-        run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-
-      - name: Build Docker image (test only)
-        run: docker build --platform linux/amd64 -t meetup-backend-test .
-
-  deploy:
-    name: Push image + Deploy to Render (only main)
-    if: github.ref == 'refs/heads/main'  # körs bara på main
-    needs: build                         # väntar på build-jobbet
+    name: Build & Push Docker image
     runs-on: ubuntu-latest
 
     steps:
@@ -35,11 +19,29 @@ jobs:
       - name: Login to Docker Hub
         run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
+      - name: Set Docker tag based on branch
+        id: vars
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "TAG=latest" >> $GITHUB_ENV
+          elif [ "${{ github.ref }}" == "refs/heads/dev" ]; then
+            echo "TAG=dev" >> $GITHUB_ENV
+          else
+            echo "TAG=test" >> $GITHUB_ENV
+          fi
+
       - name: Build Docker image
-        run: docker build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/meetup-backend:latest .
+        run: docker build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/meetup-backend:${{ env.TAG }} .
 
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/meetup-backend:latest
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/meetup-backend:${{ env.TAG }}
 
+  deploy:
+    name: Trigger Render Deploy (only main)
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Trigger Render Deploy
         run: curl -X POST ${{ secrets.RENDER_HOOK_URL }}
