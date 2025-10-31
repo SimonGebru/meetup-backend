@@ -8,16 +8,17 @@ import { CATEGORY_OPTIONS } from "../models/Meetup.js";
 const router = Router();
 
 
-// get all meetups sorterat med date
+
+// get ALL meetups (både kommande och tidigare)
 router.get("/", async (req, res) => {
   try {
-    const meetups = await Meetup.find({ date: { $gte: new Date() } })
+    const meetups = await Meetup.find()
       .sort({ date: 1 })
       .lean();
 
     res.json(meetups);
   } catch (err) {
-    console.error(err);
+    console.error("GET /api/meetups error:", err);
     res.status(500).json({ message: "Failed to fetch meetups" });
   }
 });
