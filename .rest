@@ -1,0 +1,78 @@
+@baseUrl = http://localhost:8080
+@json = application/json
+
+### ─────────────────────────────────────────────────────────
+### Health check
+GET {{baseUrl}}/
+
+### ─────────────────────────────────────────────────────────
+### Sign up (run once; change email each time if re-running)
+POST {{baseUrl}}/api/auth/signup
+Content-Type: {{json}}
+
+{
+  "email": "test.user1@example.com ",
+  "password": "secret123",
+  "name": "Test User"
+}
+
+### ─────────────────────────────────────────────────────────
+### Login (copy the token from the response into @token below)
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{json}}
+
+{
+  "email": "test.user1@example.com",
+  "password": "secret123"
+}
+
+### ─────────────────────────────────────────────────────────
+### Paste your token here after logging in
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTAzODljNDgxNDA0N2ZjZmZhNjRiYTgiLCJpYXQiOjE3NjE5MjcxNzIsImV4cCI6MTc2MjUzMTk3Mn0.mdot9PRg7icmZZf9Y_bmsaKe7rmmXSYMhEiUaPdx95U
+
+### ─────────────────────────────────────────────────────────
+### Create a meetup (requires auth)
+# Allowed categories:
+# ["Teknik/tech","Sport","Konst","Mat","Musik","Affärer/business"]
+POST {{baseUrl}}/api/meetups
+Content-Type: {{json}}
+Authorization: Bearer {{token}}
+
+{
+  "title": "Tobbes Frontend Tutorial",
+  "description": "Lär dig frontend från Tobbe the Tank",
+  "date": "2030-06-01T18:00:00.000Z",
+  "location": "Zimbabwe",
+  "host": "Tobias",
+  "maxParticipants": 105,
+  "categories": ["Tech"]
+}
+
+### ─────────────────────────────────────────────────────────
+### List upcoming meetups
+GET {{baseUrl}}/api/meetups
+
+### ─────────────────────────────────────────────────────────
+### Set a meetup id here to test single/join/unregister/delete
+@meetupId = 6904e040f962e0adc9fc4380
+
+### Get a single meetup by id
+GET {{baseUrl}}/api/meetups/{{meetupId}}
+
+### ─────────────────────────────────────────────────────────
+### Join a meetup (requires auth)
+POST {{baseUrl}}/api/meetups/{{meetupId}}/join
+Authorization: Bearer {{token}}
+
+### ─────────────────────────────────────────────────────────
+### Unregister from a meetup (requires auth)
+DELETE {{baseUrl}}/api/meetups/{{meetupId}}/join
+Authorization: Bearer {{token}}
+
+### ─────────────────────────────────────────────────────────
+### Delete a meetup (requires auth)
+DELETE {{baseUrl}}/api/meetups/{{meetupId}}
+Authorization: Bearer {{token}}
+
+### ─────────────────────────────────────────────────────────
+

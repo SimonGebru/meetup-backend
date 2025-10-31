@@ -23,6 +23,10 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  meetups: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Meetup"
+  }]
 });
 
 userSchema.pre("save", async function (next) {
