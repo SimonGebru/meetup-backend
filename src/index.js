@@ -10,19 +10,33 @@ const app = express();
 
 /* CORS-konfiguration */
 app.use(
-  cors({
-    origin: [
-      "http://localhost:5173", 
-      "http://meetup-frontend-12345.s3-website.eu-north-1.amazonaws.com", 
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
-
-// Hanterar preflight-requests från webbläsaren
-app.options("*", cors());
+    cors({
+      origin: [
+        "http://localhost:5173", // utveckling
+        "http://meetup-frontend-12345.s3-website.eu-north-1.amazonaws.com", // S3-bucket
+      ],
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+      credentials: true,
+    })
+  );
+  
+  
+  app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+    res.header(
+      "Access-Control-Allow-Methods",
+      "GET,POST,PUT,DELETE,OPTIONS"
+    );
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization"
+    );
+    if (req.method === "OPTIONS") {
+      return res.sendStatus(204); 
+    }
+    next();
+  });
 
 app.use(express.json());
 
