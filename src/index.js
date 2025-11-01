@@ -1,24 +1,33 @@
 import "dotenv/config";
 import express from "express";
-import cors from "cors";
 import mongoose from "mongoose";
+import cors from "cors";
 
 import authRouter from "./routes/auth.js";
 import meetupRouter from "./routes/meetups.js";
 
 const app = express();
 
-/*CORS-konfiguration  */
+
 const allowedOrigins = [
-  "http://localhost:5173",
+  "http://localhost:5173", 
   "http://meetup-frontend-12345.s3-website.eu-north-1.amazonaws.com",
+  "https://meetup-frontend-12345.s3.eu-north-1.amazonaws.com", 
 ];
+
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
+  console.log("🌐 CORS request from:", origin);
+
   if (allowedOrigins.includes(origin)) {
     res.header("Access-Control-Allow-Origin", origin);
+  } else {
+    console.warn("Origin not in allowed list:", origin);
+    
+    res.header("Access-Control-Allow-Origin", "*");
   }
+
   res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
   res.header(
     "Access-Control-Allow-Headers",
@@ -26,8 +35,9 @@ app.use((req, res, next) => {
   );
   res.header("Access-Control-Allow-Credentials", "true");
 
- 
+  
   if (req.method === "OPTIONS") {
+    console.log("✅ Preflight request handled");
     return res.sendStatus(204);
   }
 
@@ -43,13 +53,22 @@ app.get("/", (req, res) => {
   res.send("✅ Meetup backend is running! " + new Date().toISOString());
 });
 
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "❌ Route not found: " + req.originalUrl,
+  });
+});
+
+
 const PORT = process.env.PORT || 8080;
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/meetup";
+const MONGO_URI = process.env.MONGO_URI;
 
 mongoose
   .connect(MONGO_URI)
   .then(() => {
-    console.log("MongoDB connected");
+    console.log(" MongoDB connected");
     app.listen(PORT, () =>
       console.log(`🚀 Server running at http://localhost:${PORT}`)
     );
