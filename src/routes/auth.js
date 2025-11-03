@@ -9,13 +9,13 @@ router.post("/signup", async (req, res) => {
     const { email, password, name } = req.body;
 
     if ((!email, !password, !name)) {
-      return res.status(401).json({ message: "Alla fält behöver fyllas i" });
+      return res.status(401).json({ message: "All fields are required" });
     }
 
     const existingMail = await User.findOne({ email: email.toLowerCase() });
     if (existingMail) {
       return res.status(400).json({
-        message: "Denna användaren finns redan",
+        message: "This user already exists",
       });
     }
 
@@ -28,7 +28,7 @@ router.post("/signup", async (req, res) => {
     const token = generateToken(user._id);
 
     res.status(201).json({
-      message: "Användare skapad",
+      message: "User created",
       token,
       user: {
         id: user._id,
@@ -39,7 +39,7 @@ router.post("/signup", async (req, res) => {
   } catch (error) {
     console.error("Reg error", error);
     res.status(500).json({
-      error: "Failade att skapa en user",
+      error: "Failed to create user",
     });
   }
 });
@@ -52,23 +52,23 @@ router.post("/login", async (req, res) => {
     if ((!email, !password)) {
       return res
         .status(400)
-        .json({ error: "Måste skriva in email och lösenord" });
+        .json({ error: "Email and password are required" });
     }
 
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
-      return res.status(400).json({ error: "Ogiltig email" });
+      return res.status(400).json({ error: "Invalid email" });
     }
 
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
-      return res.status(400).json({ error: "Fel lösenord" });
+      return res.status(400).json({ error: "Invalid password" });
     }
 
     const token = generateToken(user._id);
 
     res.json({
-      message: "Inloggad!",
+      message: "Logged in!",
       token,
       user: {
         id: user._id,

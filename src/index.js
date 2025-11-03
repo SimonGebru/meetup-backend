@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import authRouter from "./routes/auth.js";
 import meetupRouter from "./routes/meetups.js"
+import userRouter from "./routes/user.js";
 import cors from "cors";
 import mongoose from "mongoose";
 const app = express();
@@ -10,6 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/auth", authRouter);
+app.use("/api/me", userRouter)
 app.use("/api/meetups", meetupRouter);
 
 app.get("/", (req, res) => {

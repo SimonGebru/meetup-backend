@@ -7,12 +7,12 @@ const userSchema = new mongoose.Schema({
     unique: true,
     lowercase: true,
     trim: true,
-    match: [/^\S+@\S+\.\S+$/, "Ange email"],
+    match: [/^\S+@\S+\.\S+$/, "Provide email"],
   },
   password: {
     type: String,
-    minlength: [6, "Lösenord måste vara minst 6 tecken"],
-    required: [true, "Ange lösenord"],
+    minlength: [6, "Password must be atleast 6 characters long"],
+    required: [true, "Provide password"],
   },
   name: {
     type: String,
