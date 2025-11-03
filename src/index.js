@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 
 import authRouter from "./routes/auth.js";
+import userRouter from "./routes/user.js"
 import meetupRouter from "./routes/meetups.js";
 
 const app = express();
@@ -47,6 +48,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 app.use("/api/auth", authRouter);
+app.use("/api/me", userRouter)
 app.use("/api/meetups", meetupRouter);
 
 app.get("/", (req, res) => {

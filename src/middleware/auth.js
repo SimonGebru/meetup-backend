@@ -5,7 +5,7 @@ const authMiddleware = (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
-        message: "Ange en token",
+        message: "Provide a token",
       });
     }
 
@@ -18,10 +18,10 @@ const authMiddleware = (req, res, next) => {
     next();
   } catch (error) {
     if (error.name === "JsonWebTokenError") {
-      return res.status(401).json({ error: "Ogiltig token" });
+      return res.status(401).json({ error: "Invalid token" });
     }
     if (error.name === "TokenExpiredError") {
-      return res.status(401).json({ error: "Token har gått ut" });
+      return res.status(401).json({ error: "Token expired" });
     }
     return res.status(401).json({ error: "Auth failed" });
   }
