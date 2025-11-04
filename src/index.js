@@ -6,6 +6,7 @@ import cors from "cors";
 import authRouter from "./routes/auth.js";
 import userRouter from "./routes/user.js"
 import meetupRouter from "./routes/meetups.js";
+import reviewRouter from "./routes/reviews.js "
 
 const app = express();
 
@@ -50,6 +51,7 @@ app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/me", userRouter)
 app.use("/api/meetups", meetupRouter);
+app.use("/api/meetups", reviewRouter);
 
 app.get("/", (req, res) => {
   res.send("✅ Meetup backend is running! " + new Date().toISOString());
