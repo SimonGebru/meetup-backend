@@ -33,6 +33,7 @@ router.post("/signup", async (req, res) => {
       user: {
         id: user._id,
         email: user.email,
+        name: user.name,
         createdAt: user.createdAt,
       },
     });
@@ -73,6 +74,7 @@ router.post("/login", async (req, res) => {
       user: {
         id: user._id,
         email: user.email,
+        name: user.name,
         createdAt: user.createdAt,
       },
     });

@@ -88,6 +88,7 @@ router.get("/:id/reviews", async (req, res) => {
     res.json({
       reviews: reviews.map((review) => ({
         id: review._id,
+        meetupId: review.meetupId?._id || review.meetupId,
         rating: review.rating,
         comment: review.comment,
         createdAt: review.createdAt,
