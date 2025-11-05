@@ -23,6 +23,61 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Filtrera meetups
+router.get("/filters", async (req, res) => {
+  try {
+    const {from, to, location, categories} = req.query;
+
+    const filter = {};
+
+    if (from || to ) {
+      filter.date = {};
+      if (from) {
+        const fromDate = new Date(from)
+        if(isNaN(fromDate.getTime())) {
+          return res.status(400).json({message: "Invalid from date format"})
+        }
+        filter.date.$gte = fromDate;
+      }
+      if (to) {
+        const toDate = new Date(to);
+        if (isNaN(toDate.getTime())) {
+          return res.status(400).json({message: "Invalid to date format"})
+        }
+        filter.date.$lte = toDate;
+      }
+    }
+
+    if (location) {
+      filter.location = { $regex: location.trim(), $options: "i" }
+    }
+
+    if (categories) {
+      const cat = Array.isArray(categories) 
+      ? categories
+      : categories.split(",").map(c => c.trim());
+      filter.categories = { $in: cat };
+    }
+
+    const meetups = await Meetup.find(filter)
+    .sort({date: 1})
+    .lean()
+    
+    res.json({
+      meetups,
+      total: meetups.length,
+      filters: {
+        from: from || null,
+        to: to || null,
+        location: location || null,
+        categories: categories || null
+      }
+    })
+  } catch (err) {
+    console.error("GET filters error", err)
+    res.status(500).json({message: "Couldn't filter meetups"})
+  }
+});
 
 // get specifik meetup genom id
 router.get("/:id", async (req, res) => {
