@@ -2,6 +2,7 @@ import { Router } from "express";
 import mongoose from "mongoose";
 import Meetup from "../models/Meetup.js";
 import User from "../models/User.js";
+import Review from "../models/Reviews.js"
 import { authMiddleware } from "../middleware/auth.js";
 import { CATEGORY_OPTIONS } from "../models/Meetup.js";
 
@@ -242,6 +243,8 @@ router.delete("/:id", authMiddleware, async (req, res) => {
 
     
     await User.updateMany({}, { $pull: { meetups: id } });
+
+    await Review.deleteMany({meetupId: id});
 
     res.json({ message: "Meetup deleted" });
   } catch (err) {
